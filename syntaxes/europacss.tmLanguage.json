@@ -1,0 +1,68 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "EuropaCSS",
+  "scopeName": "source.css.europacss",
+  "fileTypes": ["css", "pcss", "postcss"],
+  "injectionSelector": "L:source.css -comment -string",
+  "patterns": [
+    {
+      "include": "#europa-at-rules"
+    }
+  ],
+  "repository": {
+    "europa-at-rules": {
+      "patterns": [
+        {
+          "match": "@(color)\\b(?=\\s)",
+          "captures": {
+            "0": { "name": "keyword.at-rule.color.europacss" },
+            "1": { "name": "entity.name.tag.css" }
+          }
+        },
+        {
+          "match": "@(space|responsive|font|fontsize|column|grid|row|display|abs100|if|iterate|unpack|europa)\\b(?=\\s)",
+          "captures": {
+            "0": { "name": "keyword.at-rule.europacss" },
+            "1": { "name": "entity.name.tag.css" }
+          }
+        },
+        {
+          "match": "(?<=@color\\s+)(fg|bg|fill|stroke|border|border-top|border-bottom|border-left|border-right)\\b",
+          "name": "support.type.property-value.css"
+        },
+        {
+          "match": "(?<=@color\\s+(fg|bg|fill|stroke|border|border-[a-z-]+)\\s+)([a-zA-Z0-9._-]+)\\b",
+          "name": "constant.color.rgb-value.css"
+        },
+        {
+          "match": "(?<=@space\\s+[\\w-]+\\s+)([\\w.-]+)\\b",
+          "name": "constant.numeric.css"
+        },
+        {
+          "match": "(?<=@space\\s+)([\\w-]+)\\b",
+          "name": "entity.name.type.css"
+        },
+        {
+          "match": "(?<=@font\\s+)(\\w+)\\b",
+          "name": "string.quoted.css"
+        },
+        {
+          "match": "(?<=@font\\s+\\w+\\s+|@fontsize\\s+)(\\w+)\\b",
+          "name": "constant.numeric.css"
+        },
+        {
+          "match": "(?<=@column\\s+)([\\w.-]+\\/[\\w.-]+|[\\w.-]+)\\b",
+          "name": "constant.numeric.css"
+        },
+        {
+          "match": "(\\$[\\w-]+)\\b",
+          "name": "variable.parameter.css"
+        },
+        {
+          "match": "(?<=@responsive\\s+|@fontsize\\s+\\w+\\s+|@font\\s+\\w+\\s+\\w+\\s+|@column\\s+(?:[\\w.-]+\\/[\\w.-]+|[\\w.-]+)\\s+|@space\\s+\\w+\\s+\\w+\\s+)(?!\\$)([\\w.-]+)\\b",
+          "name": "support.constant.media.css"
+        }
+      ]
+    }
+  }
+} 

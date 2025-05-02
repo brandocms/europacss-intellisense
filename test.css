@@ -1,0 +1,15 @@
+.test {
+  /* Try typing '@' below to see completions */
+  @color bg beige;
+  @color bg red;
+  @font mono small $mobile;
+  @column 12/12 $mobile;
+  @color fg dbg;
+  @fontsize h2 $tablet;
+  @space padding-top block_half $tablet;
+  @color bg dbg;
+  @color fg #00FF00;
+  @space margin-bottom block_triple iphone;
+  @fontsize h2 ipad_portrait;
+  @space width calc(var[container] * -1) $desktop;
+}

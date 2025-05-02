@@ -1,0 +1,34 @@
+/* Sample CSS using EuropaCSS at-rules */
+
+.header {
+  @color fg primary;
+  @space margin-bottom md;
+  @font sans xl;
+}
+
+.container {
+  @responsive md {
+    @space padding md;
+    @display flex;
+  }
+}
+
+.button {
+  @space padding-x md;
+  @space padding-y sm;
+  @color bg primary;
+  @color fg white;
+  @fontsize base;
+}
+
+.grid {
+  @grid;
+}
+
+.sidebar {
+  @column 3/12;
+}
+
+.content {
+  @column 9/12;
+}

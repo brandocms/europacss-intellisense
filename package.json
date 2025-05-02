@@ -1,0 +1,61 @@
+{
+  "name": "europacss-intellisense",
+  "displayName": "EuropaCSS IntelliSense",
+  "description": "IntelliSense for EuropaCSS",
+  "version": "1.0.0",
+  "publisher": "user",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.65.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Snippets"
+  ],
+  "activationEvents": [
+    "onLanguage:css",
+    "onLanguage:postcss"
+  ],
+  "main": "src/index.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "css",
+        "aliases": ["CSS", "css"],
+        "extensions": [".css"]
+      },
+      {
+        "id": "postcss",
+        "aliases": ["PostCSS", "postcss"],
+        "extensions": [".pcss", ".postcss"]
+      }
+    ],
+    "grammars": [
+      {
+        "scopeName": "source.css.europacss",
+        "path": "./syntaxes/europacss.tmLanguage.json",
+        "injectTo": ["source.css", "source.postcss"]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/index.js --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild:watch": "npm run esbuild-base -- --sourcemap --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "postcss": "^8.5.3",
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.5"
+  }
+}
