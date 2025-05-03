@@ -2,6 +2,10 @@
   "name": "europacss-intellisense",
   "displayName": "EuropaCSS IntelliSense",
   "description": "IntelliSense for EuropaCSS",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brandocms/europacss-intellisense.git"
+  },
   "version": "1.0.0",
   "publisher": "user",
   "license": "MIT",
