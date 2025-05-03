@@ -2,6 +2,64 @@ const fs = require('fs')
 const path = require('path')
 const _ = require('lodash')
 const vm = require('vm')
+const url = require('url')
+
+/**
+ * Find the closest Europa configuration file to the given file path
+ * @param {string} filePath - Path to the file (URI format)
+ * @param {Array} workspaceFolders - Array of workspace folders
+ * @returns {string|null} - Path to the Europa config file, or null if not found
+ */
+function findClosestEuropaConfigPath(filePath, workspaceFolders) {
+  if (!filePath) return null
+
+  // Convert URI to file path
+  const fileSystemPath = filePath.startsWith('file://')
+    ? url.fileURLToPath(filePath)
+    : filePath.replace('file://', '')
+
+  // Get directory of the file
+  let dir = path.dirname(fileSystemPath)
+
+  // Keep track of workspace boundaries
+  const workspacePaths = workspaceFolders
+    ? workspaceFolders.map(folder => folder.uri.replace('file://', ''))
+    : []
+
+  // Check if we're still in a workspace
+  const isInWorkspace = dirPath => {
+    return workspacePaths.some(wsPath => dirPath.startsWith(wsPath))
+  }
+
+  // Start from the file's directory and move up until we find a config
+  // or reach the workspace boundary
+  while (dir && isInWorkspace(dir)) {
+    // Check for both .js and .cjs variants
+    const jsConfigPath = path.join(dir, 'europa.config.js')
+    const cjsConfigPath = path.join(dir, 'europa.config.cjs')
+
+    if (fs.existsSync(jsConfigPath)) {
+      return jsConfigPath
+    }
+
+    if (fs.existsSync(cjsConfigPath)) {
+      return cjsConfigPath
+    }
+
+    // Move up one directory level
+    const parentDir = path.dirname(dir)
+
+    // If we've reached the root, stop searching
+    if (parentDir === dir) {
+      break
+    }
+
+    dir = parentDir
+  }
+
+  // If we couldn't find a nearest config, fall back to workspace-level configs
+  return findEuropaConfigPath(workspaceFolders)
+}
 
 /**
  * Finds the Europa configuration file in the workspace
@@ -16,10 +74,17 @@ function findEuropaConfigPath(workspaceFolders) {
   // Check each workspace folder for config
   for (const folder of workspaceFolders) {
     const folderPath = folder.uri.replace('file://', '')
-    const configPath = path.join(folderPath, 'europa.config.js')
 
-    if (fs.existsSync(configPath)) {
-      return configPath
+    // Check for both .js and .cjs variants
+    const jsConfigPath = path.join(folderPath, 'europa.config.js')
+    const cjsConfigPath = path.join(folderPath, 'europa.config.cjs')
+
+    if (fs.existsSync(jsConfigPath)) {
+      return jsConfigPath
+    }
+
+    if (fs.existsSync(cjsConfigPath)) {
+      return cjsConfigPath
     }
   }
 
@@ -58,20 +123,14 @@ function loadEuropaConfig(configPath) {
 
     // Get the exported config
     const userConfig = sandbox.module.exports
-
-    console.log(
-      'Loaded Europa config:',
-      JSON.stringify(userConfig, null, 2).substring(0, 500) + '...'
-    )
-
     return userConfig
   } catch (error) {
-    console.error(`Error loading Europa config: ${error.message}`)
     return null
   }
 }
 
 module.exports = {
   findEuropaConfigPath,
+  findClosestEuropaConfigPath,
   loadEuropaConfig,
 }

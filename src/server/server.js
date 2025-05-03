@@ -9,7 +9,11 @@ const {
 } = require('vscode-languageserver/node')
 
 const { TextDocument } = require('vscode-languageserver-textdocument')
-const { findEuropaConfigPath, loadEuropaConfig } = require('./configLoader')
+const {
+  findEuropaConfigPath,
+  findClosestEuropaConfigPath,
+  loadEuropaConfig,
+} = require('./configLoader')
 const {
   getAtRuleCompletions,
   getColorCompletions,
@@ -32,7 +36,62 @@ let config = {
   workspaceFolders: [],
 }
 
+// Keep track of configs for different files/directories
+const configCache = new Map()
+
+// Default europaConfig (workspace level)
 let europaConfig = null
+
+// Handle document open events to load appropriate config
+documents.onDidOpen(event => {
+  const document = event.document
+  const uri = document.uri
+
+  // Find the closest config to this document
+  loadConfigForDocument(uri)
+})
+
+// Load the appropriate config for a document
+function loadConfigForDocument(documentUri) {
+  // Find the closest config file
+  const configPath = findClosestEuropaConfigPath(documentUri, config.workspaceFolders)
+
+  if (configPath) {
+    // Check if we've already loaded this config
+    if (!configCache.has(configPath)) {
+      const loadedConfig = loadEuropaConfig(configPath)
+      if (loadedConfig) {
+        configCache.set(configPath, loadedConfig)
+      }
+    }
+
+    // Associate this document with this config path
+    configCache.set(documentUri, configPath)
+
+    // If this is the first config loaded, set it as the default
+    if (!europaConfig && configCache.has(configPath)) {
+      europaConfig = configCache.get(configPath)
+    }
+  }
+}
+
+// Get the appropriate config for a document
+function getConfigForDocument(documentUri) {
+  // If we haven't processed this document yet, do it now
+  if (!configCache.has(documentUri)) {
+    loadConfigForDocument(documentUri)
+  }
+
+  // Get the config path for this document
+  const configPath = configCache.get(documentUri)
+
+  // Return the config if available, otherwise fallback to default
+  if (configPath && configCache.has(configPath)) {
+    return configCache.get(configPath)
+  }
+
+  return europaConfig
+}
 
 connection.onInitialize(params => {
   const capabilities = params.capabilities
@@ -53,20 +112,27 @@ connection.onInitialize(params => {
 })
 
 connection.onInitialized(async () => {
-  // Find and load Europa configuration
+  // Find and load default Europa configuration (workspace level)
   config.europaConfigPath = findEuropaConfigPath(config.workspaceFolders)
 
   if (config.europaConfigPath) {
     europaConfig = loadEuropaConfig(config.europaConfigPath)
+    if (europaConfig) {
+      configCache.set(config.europaConfigPath, europaConfig)
+    }
   }
 
   // Set up handlers for client-server communication about colors
-  connection.onNotification('europacss/getAllColors', () => {
-    sendAllColorsToClient()
+  connection.onNotification('europacss/getAllColors', params => {
+    // Use the document URI if provided, otherwise use default config
+    const docConfig = params.documentUri ? getConfigForDocument(params.documentUri) : europaConfig
+    sendAllColorsToClient(docConfig)
   })
 
   connection.onNotification('europacss/getColorValue', params => {
-    const colorValue = getColorFromConfig(params.colorName)
+    // Use the document URI if provided, otherwise use default config
+    const docConfig = params.documentUri ? getConfigForDocument(params.documentUri) : europaConfig
+    const colorValue = getColorFromConfig(params.colorName, docConfig)
 
     if (colorValue) {
       connection.sendNotification('europacss/colorInfo', {
@@ -84,6 +150,9 @@ connection.onCompletion(params => {
     return null
   }
 
+  // Get the config specific to this document
+  const docConfig = getConfigForDocument(document.uri)
+
   const text = document.getText()
   const position = params.position
   const offset = document.offsetAt(position)
@@ -91,8 +160,8 @@ connection.onCompletion(params => {
   // Get the current line up to the cursor position
   const currentLine = getCurrentLine(text, offset)
 
-  // Just use the regular completion items provider
-  return getCompletionItems(currentLine)
+  // Use the document-specific config for completions
+  return getCompletionItems(currentLine, docConfig)
 })
 
 // Handle completion item resolve requests
@@ -161,6 +230,9 @@ connection.onHover(params => {
     return null
   }
 
+  // Get the config specific to this document
+  const docConfig = getConfigForDocument(document.uri)
+
   const text = document.getText()
   const position = params.position
 
@@ -175,15 +247,16 @@ connection.onHover(params => {
     // Check if it's a breakpoint collection with $ prefix
     if (wordAtPosition.startsWith('$')) {
       if (
-        europaConfig?.theme?.breakpointCollections &&
-        europaConfig.theme.breakpointCollections[wordAtPosition]
+        docConfig?.theme?.breakpointCollections &&
+        docConfig.theme.breakpointCollections[wordAtPosition]
       ) {
-        const collectionValue = europaConfig.theme.breakpointCollections[wordAtPosition]
+        const collectionValue = docConfig.theme.breakpointCollections[wordAtPosition]
         return {
           contents: {
             kind: 'markdown',
             value: `### Breakpoint Collection: ${wordAtPosition}\n\n**Value:** \`${collectionValue}\`\n\n**Definition:**\n\n${getBreakpointCollectionDescription(
-              collectionValue
+              collectionValue,
+              docConfig
             )}`,
           },
         }
@@ -191,8 +264,8 @@ connection.onHover(params => {
     }
 
     // Check if it's a regular breakpoint
-    if (isKnownBreakpoint(wordAtPosition)) {
-      const breakpointInfo = getBreakpointHoverInfo(wordAtPosition)
+    if (isKnownBreakpoint(wordAtPosition, docConfig)) {
+      const breakpointInfo = getBreakpointHoverInfo(wordAtPosition, docConfig)
       if (breakpointInfo) {
         return {
           contents: {
@@ -204,8 +277,8 @@ connection.onHover(params => {
     }
 
     // Check if it's a font family
-    if (line.includes('@font') && isFontFamily(wordAtPosition)) {
-      const fontInfo = getFontHoverInfo(wordAtPosition)
+    if (line.includes('@font') && isFontFamily(wordAtPosition, docConfig)) {
+      const fontInfo = getFontHoverInfo(wordAtPosition, docConfig)
       if (fontInfo) {
         return {
           contents: {
@@ -217,8 +290,11 @@ connection.onHover(params => {
     }
 
     // Check if it's a font size
-    if ((line.includes('@font') || line.includes('@fontsize')) && isFontSize(wordAtPosition)) {
-      const sizeInfo = getFontSizeHoverInfo(wordAtPosition)
+    if (
+      (line.includes('@font') || line.includes('@fontsize')) &&
+      isFontSize(wordAtPosition, docConfig)
+    ) {
+      const sizeInfo = getFontSizeHoverInfo(wordAtPosition, docConfig)
       if (sizeInfo) {
         return {
           contents: {
@@ -230,8 +306,8 @@ connection.onHover(params => {
     }
 
     // Check if it's a color
-    if (line.includes('@color') && isColor(wordAtPosition)) {
-      const colorInfo = getColorHoverInfo(wordAtPosition)
+    if (line.includes('@color') && isColor(wordAtPosition, docConfig)) {
+      const colorInfo = getColorHoverInfo(wordAtPosition, docConfig)
       if (colorInfo) {
         return {
           contents: {
