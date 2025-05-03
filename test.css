@@ -12,4 +12,6 @@
   @space margin-bottom block_triple iphone;
   @fontsize h2 ipad_portrait;
   @space width calc(var[container] * -1) $desktop;
+  @space padding-top block_triple $desktop;
+  @fontsize 20dpx $mobile;
 }

@@ -4,8 +4,6 @@ const {
   ProposedFeatures,
   TextDocumentSyncKind,
   CompletionItemKind,
-  Hover,
-  MarkupKind,
 } = require('vscode-languageserver/node')
 
 const { TextDocument } = require('vscode-languageserver-textdocument')

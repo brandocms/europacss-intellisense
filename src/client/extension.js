@@ -12,9 +12,6 @@ const colorCache = new Map()
 const COLOR_REGEX = /@color\s+(fg|bg|fill|stroke|border|border-[a-z-]+)\s+([a-zA-Z0-9._-]+)/g
 const HEX_COLOR_REGEX = /#([0-9a-fA-F]{3,8})\b/g
 
-// Add a new regex for capturing nested color formats like blue.light
-const NESTED_COLOR_REGEX = /([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)/g
-
 const NAMED_COLORS = {
   aliceblue: '#F0F8FF',
   antiquewhite: '#FAEBD7',
@@ -200,7 +197,7 @@ function activate(context) {
     ],
     synchronize: {
       // Notify the server about file changes to europa config files contained in the workspace
-      fileEvents: vscode.workspace.createFileSystemWatcher('**/europa.config.js'),
+      fileEvents: vscode.workspace.createFileSystemWatcher('**/europa.config.{js,cjs}'),
     },
     // Add middleware to intercept the completion requests
     middleware: {

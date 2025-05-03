@@ -7,7 +7,7 @@
     "url": "https://github.com/brandocms/europacss-intellisense.git"
   },
   "version": "1.0.0",
-  "publisher": "user",
+  "publisher": "Univers",
   "license": "MIT",
   "engines": {
     "vscode": "^1.65.0"
@@ -21,7 +21,7 @@
     "onLanguage:css",
     "onLanguage:postcss"
   ],
-  "main": "src/index.js",
+  "main": "dist/extension.js",
   "contributes": {
     "languages": [
       {
