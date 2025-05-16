@@ -1,0 +1,154 @@
+{
+  "Padding Top": {
+    "prefix": "pt",
+    "body": "@space padding-top ${1:value};",
+    "description": "Add padding-top using @space"
+  },
+  "Padding Bottom": {
+    "prefix": "pb",
+    "body": "@space padding-bottom ${1:value};",
+    "description": "Add padding-bottom using @space"
+  },
+  "Padding Left": {
+    "prefix": "pl",
+    "body": "@space padding-left ${1:value};",
+    "description": "Add padding-left using @space"
+  },
+  "Padding Right": {
+    "prefix": "pr",
+    "body": "@space padding-right ${1:value};",
+    "description": "Add padding-right using @space"
+  },
+  "Padding": {
+    "prefix": "p",
+    "body": "@space padding ${1:value};",
+    "description": "Add padding using @space"
+  },
+  "Font Size": {
+    "prefix": "fs",
+    "body": "@fontsize ${1:value};",
+    "description": "Add font size using @fontsize"
+  },
+  "Margin Top": {
+    "prefix": "mt",
+    "body": "@space margin-top ${1:value};",
+    "description": "Add margin-top using @space"
+  },
+  "Margin Bottom": {
+    "prefix": "mb",
+    "body": "@space margin-bottom ${1:value};",
+    "description": "Add margin-bottom using @space"
+  },
+  "Margin Left": {
+    "prefix": "ml",
+    "body": "@space margin-left ${1:value};",
+    "description": "Add margin-left using @space"
+  },
+  "Margin Right": {
+    "prefix": "mr",
+    "body": "@space margin-right ${1:value};",
+    "description": "Add margin-right using @space"
+  },
+  "Margin": {
+    "prefix": "m",
+    "body": "@space margin ${1:value};",
+    "description": "Add margin using @space"
+  },
+  "Large Breakpoint": {
+    "prefix": "lg",
+    "body": [
+      "@responsive \\$lg {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Add large breakpoint using @responsive"
+  },
+  "Mobile Breakpoint": {
+    "prefix": "mobile",
+    "body": [
+      "@responsive \\$mobile {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Add mobile breakpoint using @responsive"
+  },
+  "iPad Portrait Breakpoint": {
+    "prefix": "ipad",
+    "body": [
+      "@responsive ipad_portrait {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Add iPad portrait breakpoint using @responsive"
+  },
+  "Column 1/12": {
+    "prefix": "col1",
+    "body": "@column 1/12;",
+    "description": "Add 1/12 column using @column"
+  },
+  "Column 2/12": {
+    "prefix": "col2", 
+    "body": "@column 2/12;",
+    "description": "Add 2/12 column using @column"
+  },
+  "Column 3/12": {
+    "prefix": "col3",
+    "body": "@column 3/12;",
+    "description": "Add 3/12 column using @column"
+  },
+  "Column 4/12": {
+    "prefix": "col4",
+    "body": "@column 4/12;",
+    "description": "Add 4/12 column using @column"
+  },
+  "Column 5/12": {
+    "prefix": "col5",
+    "body": "@column 5/12;",
+    "description": "Add 5/12 column using @column"
+  },
+  "Column 6/12": {
+    "prefix": "col6",
+    "body": "@column 6/12;",
+    "description": "Add 6/12 column using @column"
+  },
+  "Column 7/12": {
+    "prefix": "col7",
+    "body": "@column 7/12;",
+    "description": "Add 7/12 column using @column"
+  },
+  "Column 8/12": {
+    "prefix": "col8",
+    "body": "@column 8/12;",
+    "description": "Add 8/12 column using @column"
+  },
+  "Column 9/12": {
+    "prefix": "col9",
+    "body": "@column 9/12;",
+    "description": "Add 9/12 column using @column"
+  },
+  "Column 10/12": {
+    "prefix": "col10",
+    "body": "@column 10/12;",
+    "description": "Add 10/12 column using @column"
+  },
+  "Column 11/12": {
+    "prefix": "col11",
+    "body": "@column 11/12;",
+    "description": "Add 11/12 column using @column"
+  },
+  "Column 12/12": {
+    "prefix": "col12",
+    "body": "@column 12/12;",
+    "description": "Add 12/12 column using @column"
+  },
+  "Flex Column": {
+    "prefix": "fc",
+    "body": "@display flex/column/nowrap;",
+    "description": "Add flex column display using @display"
+  },
+  "Flex Row": {
+    "prefix": "fr",
+    "body": "@display flex/row/wrap;",
+    "description": "Add flex row display using @display"
+  }
+} 

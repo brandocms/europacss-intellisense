@@ -41,6 +41,16 @@
         "path": "./syntaxes/europacss.tmLanguage.json",
         "injectTo": ["source.css", "source.postcss"]
       }
+    ],
+    "snippets": [
+      {
+        "language": "css",
+        "path": "./snippets/europacss.code-snippets"
+      },
+      {
+        "language": "postcss",
+        "path": "./snippets/europacss.code-snippets"
+      }
     ]
   },
   "scripts": {
